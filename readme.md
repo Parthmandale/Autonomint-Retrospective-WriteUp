@@ -1,12 +1,12 @@
 # Autonomint-Retrospective-WriteUp
 
 ## Approach 
-- Core problem:
-- What steps lead the auditor to find this bug?
-- What question he posed that lead him to this bug?
-- How to find it next time:
+#### Core problem:
+#### What steps lead the auditor to find this bug?
+#### What question he posed that lead him to this bug?
+#### How to find it next time:
 
-## [H-1-696] - Users can withdraw liquidated collateral (through liq type 2) 
+## [H-1-#696] - Users can withdraw liquidated collateral (through liq type 2) 
 
 #### Core problem:
 - This `depositDetail.liquidated` gets updated in liq type 1 but not in type 2, due to this in withdraw function this line `if (depositDetail.liquidated) revert IBorrowing.Borrow_AlreadyLiquidated();` will not revert for for liq type 2, and due to this user will be able to repay his debt and take out his collateral even after
@@ -25,7 +25,7 @@ here it means he is withdrawing someone elses collateral, its like stealing the 
 - Simply compare the two likely/opposite functions, and compare there state changes and if you found some inconsistency then try to see the bad state due to that inconsistency.
 
 
-## [H-2-272] - Borrowing::redeemYields debits ABOND from msg.sender but redeems to user using ABOND.State data from user
+## [H-2-#272] - Borrowing::redeemYields debits ABOND from msg.sender but redeems to user using ABOND.State data from user
 
 #### Core problem:
 - `msg.sender` and `user` for which the redeem is supposed to be done, should have been been same, with a check, but its missing. And due to this, many inconsistency is occuring and therefore this bug is giving path to attack vector.
@@ -42,7 +42,7 @@ here it means he is withdrawing someone elses collateral, its like stealing the 
 #### How to find it next time:
 - next time you see this kind of inconsistency, take an example where msg.sender and user are different with in reality both address holding by an attacker and try to exploit by taking different kind of scenarios, like in this one msg.sender address of attacker didn't had any ABOND token, but still just to apply this attack he bought it from external market. So apply all this kind of logic in order to bring the bad state of protocol and other users.
 
-## [H-3-746] - Type 1 borrower liquidation will incorrectly add cds profit directly to totalCdsDepositedAmount
+## [H-3-#746] - Type 1 borrower liquidation will incorrectly add cds profit directly to totalCdsDepositedAmount
 
 #### Core problem:
 -  incorrect reduction by `omniChainData.totalCdsDepositedAmount -= liquidationAmountNeeded - cdsProfits;` The problem with this approach is that it will always calculate cumulative values and option fees based on this value,  which now differs from the individual sum of cds depositors, leading to untracked values, such as the cumulative value from the vault long position or option fees.
@@ -57,4 +57,30 @@ here it means he is withdrawing someone elses collateral, its like stealing the 
 #### How to find it next time:
 - Be more mindful when any calculations occurs and by default think it is incorrect, and then take different edge case examples in order to find if it gives the expected output or not
   
+## [H-4-281] - Using wrong noOfLiqudiations when storing LiquidationInfo in the other chain
 
+#### Core problem:
+- wrong variable is is been sent inorder to update the states. `noOfLiquidations` is used instead of `omniChainData.noOfLiquidations.` in
+ here. when the LiquidationInfo data is returned to `Borrowing::liquidate`, so it can be sent to the other chain to update the data, the `noOfLiquidations` value of the chain where the liquidation is occurring is used as index to update in the other chain instead of using `omniChainData.noOfLiquidations`. Impact due to this is - `LiquidationInfo` across chains will be inconsistent, and could be lost in some cases. Part of liquidation earnings of CDS depositors who opted for liquidation will be lost.
+
+#### What steps lead the auditor to find this bug?
+- checking each and every variable this is being used in order to update the things, and also knowing what does the meaning and difference between all the variables are.
+  
+#### What question he posed that lead him to this bug?
+- he knew the no. of liq from each chain will be different from no. of liq globally, so if a wrong input var is used to update something, then things are going to have bad impact.
+
+#### How to find it next time:
+Just be mindfull what is meaning of each var and whether it should be used in certain places or not.
+
+
+## [H-5-52] - 
+
+#### Core problem:
+#### What steps lead the auditor to find this bug?
+#### What question he posed that lead him to this bug?
+#### How to find it next time:
+
+
+
+
+ 
