@@ -42,4 +42,19 @@ here it means he is withdrawing someone elses collateral, its like stealing the 
 #### How to find it next time:
 - next time you see this kind of inconsistency, take an example where msg.sender and user are different with in reality both address holding by an attacker and try to exploit by taking different kind of scenarios, like in this one msg.sender address of attacker didn't had any ABOND token, but still just to apply this attack he bought it from external market. So apply all this kind of logic in order to bring the bad state of protocol and other users.
 
+## [H-3-746] - Type 1 borrower liquidation will incorrectly add cds profit directly to totalCdsDepositedAmount
+
+#### Core problem:
+-  incorrect reduction by `omniChainData.totalCdsDepositedAmount -= liquidationAmountNeeded - cdsProfits;` The problem with this approach is that it will always calculate cumulative values and option fees based on this value,  which now differs from the individual sum of cds depositors, leading to untracked values, such as the cumulative value from the vault long position or option fees.
+-  impact - Cumulative value calculations and option fees will be incorrect, as they are divided by a bigger number of cds deposited (which was added the profit), but each cds depositor only has the same deposited amount to multiply by these rates.
+
+#### What steps lead the auditor to find this bug?
+- he mainly found this because he knew exactly what is `omniChainData.totalCdsDepositedAmount` and where and how it was supposed to be updated and by how much, he knew if this got calculated then other things that are calculated on the basis of it, will also be incorrectly calculated and will create problem. So he knew this was incorrrectly calculated then he found the impact by navigating calculations where `omniChainData.totalCdsDepositedAmount` is used.
+
+#### What question he posed that lead him to this bug?
+- he questioned with logical real example, if this calculation is correct or not. Here being mindfull is very important.
+
+#### How to find it next time:
+- Be more mindful when any calculations occurs and by default think it is incorrect, and then take different edge case examples in order to find if it gives the expected output or not
+  
 
