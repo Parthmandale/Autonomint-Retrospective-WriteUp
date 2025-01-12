@@ -1,6 +1,6 @@
 # Autonomint-Retrospective-WriteUp
 
-## Approach 
+### Approach 
 #### Core problem:
 #### What steps lead the auditor to find this bug?
 #### What question he posed that lead him to this bug?
@@ -70,17 +70,28 @@ here it means he is withdrawing someone elses collateral, its like stealing the 
 - he knew the no. of liq from each chain will be different from no. of liq globally, so if a wrong input var is used to update something, then things are going to have bad impact.
 
 #### How to find it next time:
-Just be mindfull what is meaning of each var and whether it should be used in certain places or not.
+Just be mindful what is meaning of each var and whether it should be used in certain places or not.
 
 
-## [H-5-52] - 
+## [H-5-752] - Liquidation cds profits are not backed which will lead to insolvency
+
+#### Core problem:
+- [cds profit](https://github.com/sherlock-audit/2024-11-autonomint/blob/main/Blockchain/Blockchian/contracts/Core_logic/borrowLiquidation.sol#L212) in liq type 1 been calculated out of the amount that was deposited by the borrower at the time of deposit, for ex it was of 1000$ but in reality when that asset is being calculated for cds profit, it is under liquidation, and liquidation happens only when the asset price falls below 20%, so it means the current price of that Asset is only $800, so now cds
+profit is been calculated out of $ 800, and to note that the borrower himself took loan of 800$ at that time, so here in reality protocol is not having any profit for cds depositors,
+so the amount that will be distrubuded to cds depositer will be from teasury, that was for somme other use. 
+
+#### What steps lead the auditor to find this bug?
+- Critical thinking, that in reality, the current asset price is 800 and the loan was of also 800, so where is the profit?
+
+#### What question he posed that lead him to this bug?
+- thinking as if he is really calculationg for real life profit, like in numbers yes there is profit that can be seen in the formula, but in reallity the price of asset is already dropped so will that be profit for real or not?
+
+### How to find it next time:
+Think in real life how much profit you are goona get in real life, as you know 1 eth = 1000 was getting calculated here, but in reality I need to think, what is the real profit i was getting for liquidation, because in reality now 1 eth = 800.
+
+## [H-6] - 
 
 #### Core problem:
 #### What steps lead the auditor to find this bug?
 #### What question he posed that lead him to this bug?
 #### How to find it next time:
-
-
-
-
- 
