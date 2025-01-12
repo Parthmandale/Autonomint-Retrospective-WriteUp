@@ -87,11 +87,13 @@ so the amount that will be distrubuded to cds depositer will be from teasury, th
 - thinking as if he is really calculationg for real life profit, like in numbers yes there is profit that can be seen in the formula, but in reallity the price of asset is already dropped so will that be profit for real or not?
 
 ### How to find it next time:
-Think in real life how much profit you are goona get in real life, as you know 1 eth = 1000 was getting calculated here, but in reality I need to think, what is the real profit i was getting for liquidation, because in reality now 1 eth = 800.
+- Think in real life how much profit you are goona get in real life, as you know 1 eth = 1000 was getting calculated here, but in reality I need to think, what is the real profit i was getting for liquidation, because in reality now 1 eth = 800.
 
-## [H-6] - 
+## [H-6-292] - Wrong ABONT token userState is affected in transferFrom function
 
 #### Core problem:
-#### What steps lead the auditor to find this bug?
-#### What question he posed that lead him to this bug?
+- function transferFrom() takes input param `from`, and then instead of maintaining it in all updates of debit(-) of ABOND token, it uses msg.sender. And here the bug comes, where the msg.sender and from can be different incase of approval is done. | Also another problem is that approvals are also not checked, neither from and msg.sender, in this case anyone can transfer from to anyone malaciously.   
 #### How to find it next time:
+- any inconsistency like this if we see, we should take a example where msg.sender and all input param from is different and then find bad state.
+
+## [H-7-]
